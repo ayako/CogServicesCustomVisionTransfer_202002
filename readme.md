@@ -1,4 +1,4 @@
-﻿# Custom Vision Transfer Tool
+# Custom Vision Transfer Tool
 
 Cognitive Services Custom Vision Project Transfer Tool
 
@@ -20,11 +20,21 @@ On console, type your Custom Vision project id to make copy.
 
 ## Features
 
+### v1.1 (to be updated soon ... stay tuned!)
+
+Enabled to make copy Custom Vision project into different subscription.
+Enabled to copy 256+ images per project.
+Enabled to set target iteration version to copy.
+
+##### Limitation
+
+- Up to 20 tags per project (due to Custom Vision limitation)
+
 ### v1.0
 
 Able to make copy Custom Vision project into same subscription.
 
-#### Limitation
+##### Limitation
 
 - Up to 256 images per project
 - Up to 20 tags per project
