@@ -1,4 +1,4 @@
-# Custom Vision Transfer Tool
+﻿# Custom Vision Transfer Tool
 
 Cognitive Services Custom Vision Project Transfer Tool
 
@@ -8,33 +8,34 @@ C# console (.NET core 3.1)
 
 ## How to use
 
-Set your Custom Vision Location and Training Key to Program.cs.
+On console, 
 
-```Program.cs
-        private const string cvLocation = "YOUR_CV_LOCATION";
-        private const string cvTrainingKey = "YOUR_CV_TRAINING_KEY";
-```
+- Type your Custom Vision Training Key and Endpoint of original project.
+- Type type your Custom Vision project id to make copy.
 
-On console, type your Custom Vision project id to make copy.
+After showing project details on console,
+
+- Type your Custom Vision Training Key and Endpoint of destination.
 
 
 ## Features
 
-### v1.1 (to be updated soon ... stay tuned!)
+### v1.1
 
-Enabled to make copy Custom Vision project into different subscription.
-Enabled to copy 256+ images per project.
-Enabled to set target iteration version to copy.
+- Enabled to make copy Custom Vision project into different subscription.
+- Enabled to set target iteration version to copy.
+- Enabled to copy 256+ images per project. 
 
-##### Limitation
+#### Limitation
 
-- Up to 20 tags per project (due to Custom Vision limitation)
+- Up to 20 tags per project (due to Custom Vision project limitation)
+
 
 ### v1.0
 
 Able to make copy Custom Vision project into same subscription.
 
-##### Limitation
+#### Limitation
 
 - Up to 256 images per project
 - Up to 20 tags per project

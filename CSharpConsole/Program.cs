@@ -2,69 +2,93 @@
 using Microsoft.Azure.CognitiveServices.Vision.CustomVision.Training.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace CustomVisionTransfer202002
 {
     class Program
     {
-        private const string cvLocation = "YOUR_CV_LOCATION";
-        private const string cvTrainingKey = "YOUR_CV_TRAINING_KEY";
-
-        private const string cvEndpoint = "https://" + cvLocation + ".api.cognitive.microsoft.com/";
         static void Main(string[] args)
         {
-
-            var cvClient = new CustomVisionTrainingClient() { Endpoint = cvEndpoint, ApiKey = cvTrainingKey };
-
             Console.WriteLine($"--- Custom Vision Transfer Tool ---\n");
-            Console.Write("Type your Custom Vision project id to Copy:\n");
-            var cvProjectId = new Guid(Console.ReadLine());
+
+            Console.Write("Type your Custom Vision Training Key and Endpoint to make copy:\n");
+            Console.Write("Training Key: ");
+            var cvTrainingKey_origin = Console.ReadLine();
+
+            Console.Write("Endpoint: ");
+            var cvEndpoint_origin = Console.ReadLine();
+            Console.WriteLine($"");
+
+            var cvClient_origin = new CustomVisionTrainingClient() { Endpoint = cvEndpoint_origin, ApiKey = cvTrainingKey_origin };
+
+            Console.Write("Type your Custom Vision Project Id to make copy:\n");
+            var cvProjectId_origin = new Guid(Console.ReadLine());
             Console.WriteLine($"");
 
             //GetProject
-            var project = cvClient.GetProject(cvProjectId);
-            Console.WriteLine($"Project Name: " + project.Name);
-            Console.WriteLine($"Project Type: " + project.Settings.ClassificationType + "\n");
+            var project_origin = cvClient_origin.GetProject(cvProjectId_origin);
+            Console.WriteLine($"Project Name: " + project_origin.Name);
+            Console.WriteLine($"Project Type: " + project_origin.Settings.ClassificationType + "\n");
 
             //GetIterations
-            var iterations = GetIterations(cvClient, cvProjectId);
-            Console.WriteLine($"Latest Iteration: " + iterations[0].Name + "\n");
+            var iterations = GetIterations(cvClient_origin, cvProjectId_origin);
+            Console.WriteLine($"Defined Iterations:\n");
+            for (int i = 0; i < iterations.Count; i++)
+            {
+                Console.WriteLine(i + ": " + iterations[i].Name + "\n");
+            }
+            Console.WriteLine($"Type iteration number to copy: ");
+            var iteration = int.Parse(Console.ReadLine());
+            Console.WriteLine($"");
 
             //GetTaggedImages
-            var images = GetTrainedImages(cvClient, cvProjectId, iterations[0].Id);
+            var images = GetTrainedImages(cvClient_origin, cvProjectId_origin, iterations[iteration].Id);
             Console.WriteLine($"# of Trained Images : " + images.Count + "\n");
 
             //GetTags
-            var tags = GetTags(images);
+            var cvTags_origin = GetTags(images);
 
-            Console.WriteLine($"# of Trained Tags: " + tags.Count);
-            foreach (var tag in tags)
+            Console.WriteLine($"# of Trained Tags: " + cvTags_origin.Count);
+            foreach (var tag in cvTags_origin)
             {
                 Console.WriteLine($" - " + tag.TagName);
             }
             Console.WriteLine($"");
 
+
+            Console.Write("Type your Custom Vision Training Key and Endpoint to transfer:\n");
+            Console.Write("Training Key:\n");
+            var cvTrainingKey_copy = Console.ReadLine();
+            Console.WriteLine($"");
+
+            Console.Write("Endpoint:\n");
+            var cvEndpoint_copy = Console.ReadLine();
+            Console.WriteLine($"");
+
+            var cvClient_copy = new CustomVisionTrainingClient() { Endpoint = cvEndpoint_copy, ApiKey = cvTrainingKey_copy };
+
             //CreateNewProject
-            var newProjectName = project.Name + "_" + DateTime.Now.ToString("yyyyMMdd");
-            var newProject = cvClient.CreateProject(
-                newProjectName, null, project.Settings.DomainId, project.Settings.ClassificationType);
+            var projectName_copy = project_origin.Name + "_" + DateTime.Now.ToString("yyyyMMdd");
+            var project_copy = cvClient_copy.CreateProject(
+                projectName_copy, null, project_origin.Settings.DomainId, project_origin.Settings.ClassificationType);
             Console.WriteLine($"New Project Created.");
-            Console.WriteLine($"ProjectName: " + newProject.Name);
-            Console.WriteLine($"ProjectId: " + newProject.Id + "\n");
+            Console.WriteLine($"ProjectName: " + project_copy.Name);
+            Console.WriteLine($"ProjectId: " + project_copy.Id + "\n");
 
             //CreateNewTags
-            var newTags = CreateTags(cvClient, newProject.Id, tags);
+            var cvTags_copy = CreateTags(cvClient_copy, project_copy.Id, cvTags_origin);
 
             //LoadNewTags
             Console.WriteLine($"New Tags Created.");
 
             //CreateImagesUrlEntities
-            var imageUrlEntries = CreateImageUrlCreateEntries(cvClient, newProject.Settings.ClassificationType, images, newTags);
+            var imageUrlEntries = CreateImageUrlCreateEntries(cvClient_copy, project_origin.Settings.ClassificationType, images, cvTags_copy);
             Console.WriteLine($"New Entries Created.\n");
 
             //LoadImagesUrlEntities
-            LoadImageUrlEntities(cvClient, newProject.Id, imageUrlEntries);
+            LoadImageUrlEntities(cvClient_copy, project_copy.Id, imageUrlEntries);
             Console.WriteLine($"New Entries Loading Completed.\n");
 
             Console.WriteLine($"--- Custom Vision Transfer COMPLETED ---");
@@ -80,10 +104,23 @@ namespace CustomVisionTransfer202002
             return iterations;
         }
 
-        public static IList<Image> GetTrainedImages(CustomVisionTrainingClient cvClient, Guid cvProjectId, Guid lastIterationId)
+        public static List<Image> GetTrainedImages(CustomVisionTrainingClient cvClient, Guid cvProjectId, Guid iterationId)
         {
             //GetTaggedImages
-            var images = cvClient.GetTaggedImages(cvProjectId, lastIterationId, null, null, 256);
+            List<Image> images = new List<Image>();
+            var result = new List<Image>();
+
+            var i = 0;
+            do
+            {
+                result = cvClient.GetTaggedImages(cvProjectId, iterationId, null, null, 250, i * 250).ToList<Image>();
+                if (result.Count != 0)
+                {
+                    images.AddRange(result);
+                    i += 1;
+                }
+            }
+            while (result.Count >= 250);
 
             return images;
         }
@@ -117,7 +154,7 @@ namespace CustomVisionTransfer202002
         }
 
 
-        public static List<ImageUrlCreateEntry> CreateImageUrlCreateEntries(CustomVisionTrainingClient cvClient, string classificationType, IList<Image> images, List<Tag> tags)
+        public static List<ImageUrlCreateEntry> CreateImageUrlCreateEntries(CustomVisionTrainingClient cvClient, string classificationType, List<Image> images, List<Tag> tags)
         {
             var imageUrlCreateEntries = new List<ImageUrlCreateEntry>();
 
