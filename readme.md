@@ -1,6 +1,10 @@
 ﻿# Custom Vision Transfer Tool
 
-Cognitive Services Custom Vision Project Transfer Tool
+**Cognitive Services Custom Vision Project Transfer Tool**
+
+**Cognitive Services Custom Vision プロジェクト複製ツール**
+
+Custom Vision のプロジェクト作成時の学習データ(画像)なしでプロジェクトを複製するためのツールです。(他サブスクリプションへのコピーにも対応。)
 
 ## Platform
 
