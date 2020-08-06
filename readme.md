@@ -24,6 +24,11 @@ After showing project details on console,
 
 ## Features
 
+### v1.2
+
+- Updated Custom Vision Training SDK to v2.0.0 (Microsoft.Azure.CognitiveServices.Vision.CustomVision.Training 2.0.0).
+- Show simple error message to console.
+
 ### v1.1
 
 - Enabled to make copy Custom Vision project into different subscription.
