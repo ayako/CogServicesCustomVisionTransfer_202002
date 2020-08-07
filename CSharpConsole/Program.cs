@@ -23,7 +23,10 @@ namespace CustomVisionTransfer202002
                 var cvEndpoint_origin = Console.ReadLine();
                 Console.WriteLine($"");
 
+                //GetProjects for Training Key and Endpoint verification
                 var cvClient_origin = new CustomVisionTrainingClient(new ApiKeyServiceClientCredentials(cvTrainingKey_origin)) { Endpoint = cvEndpoint_origin };
+                var projects_origin = GetProjects(cvClient_origin);
+                Console.WriteLine($"You have " + projects_origin.Count + " project(s) in this subscription.\n" );
 
                 Console.Write("Type your Custom Vision Project Id to make copy:\n");
                 var cvProjectId_origin = new Guid(Console.ReadLine());
@@ -73,7 +76,12 @@ namespace CustomVisionTransfer202002
                 var cvEndpoint_copy = Console.ReadLine();
                 Console.WriteLine($"");
 
+
+                //GetProjects for Training Key and Endpoint verification
                 var cvClient_copy = new CustomVisionTrainingClient(new ApiKeyServiceClientCredentials(cvTrainingKey_copy)) { Endpoint = cvEndpoint_copy };
+                var projects_copy = GetProjects(cvClient_copy);
+                Console.WriteLine($"You have " + projects_copy.Count + " project(s) in this subscription.\n");
+
 
                 //CreateNewProject
                 var projectName_copy = project_origin.Name + "_" + DateTime.Now.ToString("yyyyMMdd");
@@ -111,6 +119,15 @@ namespace CustomVisionTransfer202002
                 Console.ReadLine();
 
             }
+
+        }
+
+        public static IList<Project> GetProjects(CustomVisionTrainingClient cvClient) 
+        {
+            //GetProjects for Training Key and Endpoint verification
+            var projects = cvClient.GetProjects();
+
+            return projects;
 
         }
 

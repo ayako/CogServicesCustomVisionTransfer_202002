@@ -27,7 +27,8 @@ After showing project details on console,
 ### v1.2
 
 - Updated Custom Vision Training SDK to v2.0.0 (Microsoft.Azure.CognitiveServices.Vision.CustomVision.Training 2.0.0).
-- Show simple error message to console.
+- Shows simple error message to console.
+- Subscription Key varidation. (Shows error message)
 
 ### v1.1
 
